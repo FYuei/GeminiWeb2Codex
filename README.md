@@ -10,7 +10,7 @@
 > **🚀 Origin & Purpose**:
 > This project was born out of the need to reverse-engineer Google Gemini's web interface into an API and bridge it directly to the OpenAI Codex client. During this integration, the original project lacked specific streaming events, resulting in blank chat bubbles in the Codex UI.
 > 
-> This bridge provides significant convenience for users who have active Gemini subscriptions (e.g., Gemini Advanced) but prefer the coding experience within the Codex client. Combined with the [Codex++](https://github.com/lsdefine/codex-plus-plus) proxy manager (or other relay setups), it enables users to leverage Codex's rich plugin ecosystem and enhanced capabilities while utilizing Gemini as the backend.
+> This bridge provides significant convenience for users who have active Gemini subscriptions (e.g., Gemini Advanced) but prefer the coding experience within the Codex client. Combined with the [Codex++](https://github.com/b-nnett/codex-plusplus) proxy manager (or other relay setups), it enables users to leverage Codex's rich plugin ecosystem and enhanced capabilities while utilizing Gemini as the backend.
 > 
 > Based on [Sophomoresty/gemini-web2api](https://github.com/Sophomoresty/gemini-web2api), this custom fork bridges the protocol gap by implementing critical SSE events (`response.output_item.added` and `response.content_part.added`), enabling a flawless typewriter streaming effect in the Codex client.
 

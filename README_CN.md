@@ -10,7 +10,7 @@
 > **🚀 本项目的诞生背景**：
 > 本项目旨在将 Google Gemini 网页端逆向转换为 API 后，直接供给 OpenAI Codex 客户端使用。在这个对接过程中，为了解决原项目因缺少关键 SSE 事件而导致 Codex 界面渲染空白气泡的问题，该仓库应运而生。
 > 
-> 这在很大程度上能够给那些已经订阅了 Gemini（如 Gemini Advanced 会员）但仍想继续使用 Codex 客户端的用户提供便利。配合 [Codex++](https://github.com/lsdefine/codex-plus-plus) 项目使用时，还可以无缝享受到 Codex 丰富的插件生态和其他增强功能。
+> 这在很大程度上能够给那些已经订阅了 Gemini（如 Gemini Advanced 会员）但仍想继续使用 Codex 客户端的用户提供便利。配合 [Codex++](https://github.com/b-nnett/codex-plusplus) 项目使用时，还可以无缝享受到 Codex 丰富的插件生态和其他增强功能。
 > 
 > 本项目基于开源项目 [Sophomoresty/gemini-web2api](https://github.com/Sophomoresty/gemini-web2api) 派生，特别针对 Codex 协议补全了流式渲染所需的关键 SSE 事件（如 `response.output_item.added` 和 `response.content_part.added` 等），完美实现了 Codex 客户端与 Gemini Web API 的直连和打字机效果。
 
