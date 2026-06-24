@@ -1,5 +1,9 @@
 # GeminiWeb2Codex
 
+> [!IMPORTANT]
+> **🤖 智能体自主开发声明 (AI-Generated Repository)**
+> 本项目（包括接口重构、架构优化、依赖配置及所有文档手册）**全流程均由 Google DeepMind 研发的高级编程智能体 Antigravity（底层由 Gemini 3.5 Flash 模型驱动）操控并自动生成**。人类开发者仅进行高阶构想指导与部署授权。
+
 <p align="center">
   <img src="logo.png" width="200" alt="gemini-web2api logo">
 </p>
