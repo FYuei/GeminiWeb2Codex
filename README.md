@@ -1,10 +1,14 @@
-# gemini-web2api
+# GeminiWeb2Codex
 
 <p align="center">
   <img src="logo.png" width="200" alt="gemini-web2api logo">
 </p>
 
 [中文文档](README_CN.md)
+
+> [!NOTE]
+> This project is a fork of [Sophomoresty/gemini-web2api](https://github.com/Sophomoresty/gemini-web2api) with custom modifications.
+> **Main Improvement**: Added missing SSE events (`response.output_item.added` and `response.content_part.added`) for OpenAI Codex `responses` streaming protocol to fully support Codex chat bubble rendering.
 
 Convert Google Gemini's web interface into an OpenAI-compatible API. Zero cost, cross-platform, single file.
 

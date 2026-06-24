@@ -1,10 +1,14 @@
-# gemini-web2api
+# GeminiWeb2Codex
 
 <p align="center">
   <img src="logo.png" width="200" alt="gemini-web2api logo">
 </p>
 
 [English](README.md)
+
+> [!NOTE]
+> 本项目是基于开源项目 [Sophomoresty/gemini-web2api](https://github.com/Sophomoresty/gemini-web2api) 派生的修改分支。
+> **主要改进**：针对 OpenAI Codex 的 `responses` 流式协议，补全了缺少的 SSE 事件（包括 `response.output_item.added` 和 `response.content_part.added` 等），以支持 Codex 聊天气泡框的无缝流式渲染。
 
 将 Google Gemini 网页端转换为 OpenAI 兼容 API. 零成本, 跨平台, 单文件.
 
