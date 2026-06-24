@@ -6,3 +6,6 @@ cookie.json
 .env
 .idea
 .DS_Store
+.venv/
+*.working_backup
+*.egg-info/
