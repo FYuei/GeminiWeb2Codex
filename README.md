@@ -183,7 +183,8 @@ Create `config.json` in the same directory:
   "api_keys": ["sk-your-key"],
   "cookie_file": null,
   "proxy": null,
-  "log_requests": true
+  "log_requests": true,
+  "official_api_key": "AIza..."
 }
 ```
 
@@ -253,7 +254,7 @@ resp = client.chat.completions.create(
 
 ## Limitations
 
-- **No image/multimodal input**: Gemini's image upload requires a proprietary streaming RPC protocol (WIZ/ProcessFile) that cannot be replicated in a standard HTTP proxy. Image inputs in messages will be ignored with a note.
+- **Bypass Multimodal Input Limitation (Hybrid API Mode)**: By default, the web proxy cannot handle images or files (due to WIZ protocol restrictions). However, by configuring `official_api_key` in `config.json`, the proxy will automatically intercept Base64 files (Images, PDFs, Audio, etc.) and silently use the free official API (gemini-1.5-flash) in the background to perform "visual/audio extraction". The perfectly extracted text description is seamlessly appended to the prompt sent to the web interface, achieving full multimodal support!
 - **Not real Pro/Ultra**: Without a paid subscription cookie, `gemini-3.1-pro` routes to the same Flash model. The "Pro" label is a UI preference, not a backend model switch.
 - **Single-turn only**: Each request is an independent conversation. Multi-turn context is simulated by including previous messages in the prompt.
 - **Rate limits**: Google may throttle high-frequency requests. The server retries automatically but sustained heavy use may be blocked.

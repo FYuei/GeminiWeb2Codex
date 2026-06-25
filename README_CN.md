@@ -183,7 +183,8 @@ Pro 路由需要 **Gemini Advanced** (付费订阅). 免费 Google 账号的 coo
   "api_keys": ["sk-your-key"],
   "cookie_file": null,
   "proxy": null,
-  "log_requests": true
+  "log_requests": true,
+  "official_api_key": "AIza..."
 }
 ```
 
@@ -236,7 +237,7 @@ python gemini_web2api.py
 
 ## 已知限制
 
-- **不支持图片/多模态输入**: Gemini 的图片上传需要专有的 WIZ streaming RPC 协议 (ProcessFile), 无法在标准 HTTP 代理中实现. 发送图片会被忽略并返回提示.
+- **突破多模态输入限制（混合 API 模式）**: 默认情况下，网页版代理无法处理图片或文件（因为 WIZ 协议限制）。但在 `config.json` 中配置 `official_api_key` 后，代理会自动拦截图片、PDF、音频等 Base64 文件，并在后台使用免费的官方 API (gemini-1.5-flash) 进行“视觉/听觉降维提取”，将提取到的完美文字描述无缝拼接到发往网页版的 Prompt 中，从而完美实现全模态支持！
 - **Pro/Ultra 非真实路由**: 无付费订阅 cookie 时, `gemini-3.1-pro` 实际路由到 Flash 模型. "Pro" 只是 UI 偏好标签.
 - **单轮对话**: 每次请求是独立对话, 多轮上下文通过在 prompt 中包含历史消息模拟.
 - **频率限制**: Google 可能限制高频请求, server 会自动重试但持续高负载可能被封.

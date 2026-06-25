@@ -59,6 +59,7 @@ DEFAULT_CONFIG = {
     "cookie_file": None,
     "proxy": None,
     "api_keys": [],
+    "official_api_key": None,
 }
 
 CONFIG = dict(DEFAULT_CONFIG)
@@ -341,6 +342,75 @@ def extract_response_text(raw: str) -> str:
     return clean_gemini_text(text)
 
 
+def preprocess_multimodal_file(mime_type: str, b64_data: str) -> str:
+    """Send base64 data to official Gemini API to extract text/description."""
+    api_key = CONFIG.get("official_api_key")
+    if not api_key:
+        return "[Multimodal content omitted: 'official_api_key' not configured in config.json]"
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    prompt = (
+        "You are a pre-processing vision and multimodal extraction module. "
+        "Extract all text, code, and tables perfectly from this file. "
+        "Describe any visual or audio content in extreme detail so that a text-based model can understand it perfectly."
+    )
+    
+    payload = {
+        "contents": [{
+            "parts": [
+                {"text": prompt},
+                {"inlineData": {"mimeType": mime_type, "data": b64_data}}
+            ]
+        }],
+        "generationConfig": {"temperature": 0.0}
+    }
+    
+    headers = {"Content-Type": "application/json"}
+    try:
+        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers, method="POST")
+        proxy = CONFIG.get("proxy")
+        ctx = ssl.create_default_context()
+        if proxy:
+            opener = urllib.request.build_opener(
+                urllib.request.ProxyHandler({"http": proxy, "https": proxy}),
+                urllib.request.HTTPSHandler(context=ctx)
+            )
+            resp = opener.open(req, timeout=60)
+        else:
+            resp = urllib.request.urlopen(req, context=ctx, timeout=60)
+            
+        result = json.loads(resp.read().decode('utf-8'))
+        text = result["candidates"][0]["content"]["parts"][0]["text"]
+        return f"\n[Extracted Multimodal Content ({mime_type})]:\n{text}\n"
+    except Exception as e:
+        log(f"Multimodal pre-processing error: {e}")
+        return f"[Multimodal extraction failed: {e}]"
+
+
+def fetch_and_encode_url(url: str) -> tuple:
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        proxy = CONFIG.get("proxy")
+        ctx = ssl.create_default_context()
+        if proxy:
+            opener = urllib.request.build_opener(
+                urllib.request.ProxyHandler({"http": proxy, "https": proxy}),
+                urllib.request.HTTPSHandler(context=ctx)
+            )
+            resp = opener.open(req, timeout=10)
+        else:
+            resp = urllib.request.urlopen(req, context=ctx, timeout=10)
+            
+        data = resp.read()
+        mime_type = resp.headers.get_content_type()
+        b64_data = base64.b64encode(data).decode('utf-8')
+        return mime_type, b64_data
+    except Exception as e:
+        log(f"Failed to fetch remote URL: {e}")
+        return None, None
+
+
+
 # ─── OpenAI Format Helpers ───────────────────────────────────────────────────
 
 def messages_to_prompt(messages: list, tools: list = None) -> str:
@@ -367,10 +437,38 @@ def messages_to_prompt(messages: list, tools: list = None) -> str:
         role = msg.get("role", "user")
         content = msg.get("content", "")
         if isinstance(content, list):
-            content = " ".join(
-                c.get("text", "") for c in content
-                if c.get("type") in ("text", "input_text")
-            )
+            part_texts = []
+            for c in content:
+                c_type = c.get("type", "")
+                if c_type in ("text", "input_text"):
+                    part_texts.append(c.get("text", ""))
+                elif c_type in ("image_url", "file_url", "image", "file"):
+                    url_obj = c.get(c_type) or c.get("image_url") or c.get("file_url") or {}
+                    if isinstance(url_obj, str):
+                        url_val = url_obj
+                    else:
+                        url_val = url_obj.get("url", "")
+                        
+                    if isinstance(url_val, str):
+                        if url_val.startswith("data:"):
+                            try:
+                                header, b64_data = url_val.split(",", 1)
+                                mime_type = header.split(";")[0].replace("data:", "")
+                                if not mime_type:
+                                    mime_type = "image/jpeg"
+                                extracted = preprocess_multimodal_file(mime_type, b64_data)
+                                part_texts.append(extracted)
+                            except Exception as e:
+                                log(f"Failed to parse base64 file: {e}")
+                                part_texts.append("[Invalid multimodal base64 attachment]")
+                        elif url_val.startswith("http"):
+                            mime_type, b64_data = fetch_and_encode_url(url_val)
+                            if mime_type and b64_data:
+                                extracted = preprocess_multimodal_file(mime_type, b64_data)
+                                part_texts.append(extracted)
+                            else:
+                                part_texts.append(f"[Failed to fetch multimodal attachment: {url_val}]")
+            content = " ".join(part_texts)
         if role == "system":
             parts.append(f"[System instruction]: {content}")
         elif role == "assistant":
